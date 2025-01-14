@@ -1,20 +1,35 @@
 'use client';
 /* eslint-disable react/no-unescaped-entities */
 import { BookOpen, BrainCog, Camera, ImagePlus, Send, Sparkles } from "lucide-react";
-import mermaid from "mermaid";
-import { ReactNode, useState } from "react";
+import mermaid, { RenderResult } from "mermaid";
+import {  useState } from "react";
 import { useForm } from "react-hook-form";
+import Loader from "./Loader";
 
 type TFormField = {
     textInput: string;
     imageInput: FileList | null;
 };
-
+type TMessage = {
+    from: 'bot' | 'user',
+    content: {
+        text: string,
+        images?: File[],
+        svgDiagram?: Element | null,
+        summary: string
+    }
+}
 export default function ChatSection() {
     const { register, handleSubmit, setValue, getValues } = useForm<TFormField>();
-    const [diagram, setDiagram] = useState<ReactNode | null>(null);
+    const [messages, setMessages] = useState<TMessage[]>([])
+    const [isLoading, setIsLoading] = useState(false)
 
     const onSubmit = async (data: TFormField) => {
+        setMessages(prev => [...prev, { from: 'user', content: { text: data.textInput } }] as TMessage[])
+        setIsLoading(true)
+        setValue("textInput", ""); 
+        setValue("imageInput", null); 
+
         const formdata = new FormData();
         formdata.append("textInput", data.textInput);
 
@@ -26,7 +41,7 @@ export default function ChatSection() {
 
         const timestamp = Date.now();
         formdata.append("timestamp", timestamp.toString());
-        formdata.append("hash", (timestamp * timestamp + 9 + timestamp).toString());
+        formdata.append("itsHashedBro", (timestamp * timestamp + 9 + timestamp).toString());
 
         try {
             const res = await fetch("/getDiagram", {
@@ -34,17 +49,18 @@ export default function ChatSection() {
                 body: formdata,
             });
             const result = await res.json();
+            if (!result.ok) throw new Error(result.error)
+            console.log('result', result);
 
-            if (result.ok && result.mermaidCode) {
-                renderDiagram(result.mermaidCode);
-            } else {
-                console.error("Error:", result.error);
-            }
-
-            setValue("textInput", ""); // Clear text input
-            setValue("imageInput", null); // Clear image input
+            const isValidCode = await mermaid.parse(result.mermaidCode, { suppressErrors: true });
+            const svgDiagram: RenderResult | null = isValidCode
+                ? await mermaid.render("diagram", result.mermaidCode)
+                : null;
+            setMessages(prev => [...prev, { from: 'bot', content: { text: result.fallbackText, svgDiagram: svgDiagram?.svg, } }] as TMessage[])
+            setIsLoading(false)
         } catch (error) {
             console.error("Error submitting form:", error);
+            setIsLoading(false)
         }
     };
 
@@ -72,17 +88,7 @@ export default function ChatSection() {
         }
     };
 
-    const renderDiagram = async (code: string) => {
-        try {
-            const container = document.getElementById("diagram-container") as Element;
-            const svgDiagram = await mermaid.render("diagram", code, container);
-            console.log("Mermaid diagram rendered:", svgDiagram);
-            setDiagram(svgDiagram.svg);
-
-        } catch (error) {
-            console.error("Error rendering Mermaid diagram:", error);
-        }
-    };
+// console.log('messages',messages);
 
     return (
         <div className="bg-gray-400 h-screen flex items-center justify-center">
@@ -96,29 +102,51 @@ export default function ChatSection() {
                 </div>
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto sm:p-6 p-3 max-w-3xl mx-auto space-y-6 bg-[#f0f3ff]">
+                <div className="flex-1 flex flex-col overflow-y-auto sm:p-6 p-3 max-w-3xl mx-auto space-y-6 bg-[#f0f3ff]">
                     {/* AI Message */}
                     <div className="flex sm:gap-7 gap-3 bg-transparent">
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0">
                             <BrainCog className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1">
-                            <div className="flex-1 overflow-y-auto sm:p-6 p-3 max-w-3xl mx-auto space-y-6 bg-[#f0f3ff]">
-                                {/* <div id="diagram-container">{diagram && diagram as ReactNode}</div> */}
-                                <div
-                                    dangerouslySetInnerHTML={{ __html: diagram as string }}
-                                />
-                            </div>
                             <p className="text-gray-800">
                                 Hi there! 👋 I'm your study companion. Upload your notes or send me a message, and I'll help you create visual concept maps and summaries. What would you like to study today?
                             </p>
-                            <div className="mt-2 flex gap-2">
-                                <button className="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1">
-                                    <Sparkles className="w-4 h-4" /> Generate Summary
-                                </button>
-                            </div>
                         </div>
                     </div>
+                    {messages.map((msg, i) =>
+                        msg.from === 'bot' ?
+                            <div key={i} className="flex sm:gap-7 gap-3 bg-transparent">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0">
+                                    <BrainCog className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="flex-1">
+                                    {msg.content.svgDiagram && <div className="flex-1 overflow-y-auto sm:p-6 p-3 max-w-3xl mx-auto space-y-6 bg-[#f0f3ff]">
+                                        <div id="diagram-container"
+                                            dangerouslySetInnerHTML={{
+                                                //@ts-expect-error, working well
+                                                __html: msg.content.svgDiagram as string , 
+                                            }} />
+                                    </div>}
+                                    <p className="text-gray-800">
+                                        {msg.content.text}
+                                    </p>
+                                   {msg.content.svgDiagram && <div className="mt-2 flex gap-2">
+                                        <button className="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1">
+                                            <Sparkles className="w-4 h-4" /> Generate Summary
+                                        </button>
+                                    </div>}
+                                </div>
+                            </div>
+                            :
+                            <div key={i} className="flex sm:gap-7 gap-3 bg-white rounded-[107px] rounded-tr-[23px] p-3 w-fit self-end">
+                                <p className="text-gray-800">
+                                    {msg.content.text}
+                                </p>
+
+                            </div>
+                    )}
+                    {isLoading && <Loader />}
                 </div>
 
                 {/* Input Area */}
