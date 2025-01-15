@@ -1,22 +1,26 @@
 'use client';
 /* eslint-disable react/no-unescaped-entities */
-import { BookOpen, BrainCog, Camera, ImagePlus, Send, Sparkles } from "lucide-react";
+import { BookOpen, BrainCog, Camera, Download, ImagePlus, Pen, Send, Sparkles } from "lucide-react";
 import mermaid, { RenderResult } from "mermaid";
-import {  useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "./Loader";
+import Markdown from "react-markdown";
 
 type TFormField = {
     textInput: string;
     imageInput: FileList | null;
 };
 type TMessage = {
+    id: number,
     from: 'bot' | 'user',
     content: {
-        text: string,
+        fallbackText: string,
         images?: File[],
         svgDiagram?: Element | null,
         summary: string
+        mermaidCode: string
+        inputText: string
     }
 }
 export default function ChatSection() {
@@ -24,18 +28,51 @@ export default function ChatSection() {
     const [messages, setMessages] = useState<TMessage[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
+    const typewriter = (text: string, callback: () => void) => {
+        let textPosition = 0;
+        const speed = 50; // Typing speed in milliseconds
+
+        const type = () => {
+            const textHolder = document.getElementById("typing-text");
+            if (textHolder) {
+                textHolder.innerHTML = `<span>${text.substring(0, textPosition)}</span>` + `
+                <span id="blinker" style="display: inline-block; vertical-align: middle;" class="animate-bounce ml-1">
+                    <svg xmlns="http://www.w3.org/2000/svg"  width="14" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen pen"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+                    </svg>
+                </span>
+
+                `;
+            }
+
+            if (textPosition++ < text.length) {
+                setTimeout(type, speed);
+            } else {
+                // Remove the blinking cursor after typing is complete
+                setTimeout(() => {
+                    const blinker = document.getElementById("blinker");
+                    if (blinker) {
+                        blinker.remove();
+                    }
+                    callback(); // Call the callback after typing is complete
+                }, 500);
+            }
+        };
+
+        type();
+    };
+
     const onSubmit = async (data: TFormField) => {
-        setMessages(prev => [...prev, { from: 'user', content: { text: data.textInput } }] as TMessage[])
+        setMessages(prev => [...prev, { id: Math.floor(Math.random() * 999999), from: 'user', content: { inputText: data.textInput } }] as TMessage[])
         setIsLoading(true)
-        setValue("textInput", ""); 
-        setValue("imageInput", null); 
+        setValue("textInput", "");
+        setValue("imageInput", null);
 
         const formdata = new FormData();
         formdata.append("textInput", data.textInput);
 
         if (data.imageInput) {
             Array.from(data.imageInput).forEach((file, i) =>
-                formdata.append(`imageInput${i + 1}`, file)
+                formdata.append(`imageInput${i + 1} `, file)
             );
         }
 
@@ -44,7 +81,7 @@ export default function ChatSection() {
         formdata.append("itsHashedBro", (timestamp * timestamp + 9 + timestamp).toString());
 
         try {
-            const res = await fetch("/getDiagram", {
+            const res = await fetch("/api/getDiagram", {
                 method: "POST",
                 body: formdata,
             });
@@ -56,8 +93,23 @@ export default function ChatSection() {
             const svgDiagram: RenderResult | null = isValidCode
                 ? await mermaid.render("diagram", result.mermaidCode)
                 : null;
-            setMessages(prev => [...prev, { from: 'bot', content: { text: result.fallbackText, svgDiagram: svgDiagram?.svg, } }] as TMessage[])
-            setIsLoading(false)
+
+            setMessages(prev => [
+                ...prev,
+                { id: Math.floor(Math.random() * 99999999), from: "bot", content: { inputText: data.textInput, fallbackText: "", svgDiagram: svgDiagram?.svg, mermaidCode: result.mermaidCode } }
+            ] as TMessage[]);
+
+            typewriter(result.fallbackText, () => {
+                setMessages(prev =>
+                    prev.map((msg, i) =>
+                        i === prev.length - 1
+                            ? { ...msg, content: { ...msg.content, text: result.fallbackText } }
+                            : msg
+                    )
+                );
+            });
+
+            setIsLoading(false);
         } catch (error) {
             console.error("Error submitting form:", error);
             setIsLoading(false)
@@ -88,7 +140,49 @@ export default function ChatSection() {
         }
     };
 
-// console.log('messages',messages);
+
+
+    const downloadDiagram = (svgContent: string) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw the SVG onto the canvas
+            ctx?.drawImage(img, 0, 0);
+
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = "diagram.png";
+            document.body.appendChild(link);
+            link.click();
+
+            document.body.removeChild(link);
+        };
+        img.src = `data: image / svg + xml; charset = utf - 8, ${encodeURIComponent(svgContent)} `;
+    };
+
+    async function generateSummary(mermaidCode, textInput, messageId) {
+        try {
+            const formdata = new FormData();
+            formdata.append("mermaidCode", mermaidCode);
+            formdata.append("textInput", textInput);
+            const res = await fetch('/api/getSummary', {
+                method: "POST",
+                body: formdata
+            })
+            const result = await res.json()
+            console.log('summresult', result);
+            if (!result.ok) throw new Error(result.error)
+
+            setMessages(prev => prev.map((msg) => msg.id === messageId ? { ...msg, content: { ...msg.content, summary: result.summary } } : msg))
+        } catch (error) {
+            console.error("Error generating summary:", error);
+        }
+    }
 
     return (
         <div className="bg-gray-400 h-screen flex items-center justify-center">
@@ -108,12 +202,11 @@ export default function ChatSection() {
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0">
                             <BrainCog className="w-5 h-5 text-white" />
                         </div>
-                        <div className="flex-1">
-                            <p className="text-gray-800">
-                                Hi there! 👋 I'm your study companion. Upload your notes or send me a message, and I'll help you create visual concept maps and summaries. What would you like to study today?
-                            </p>
-                        </div>
+                        <p className=" text-gray-800">
+                            Hi there! 👋 I'm your study companion. Upload your notes or send me a message, and I'll help you create visual concept maps and summaries. What would you like to study today?
+                        </p>
                     </div>
+
                     {messages.map((msg, i) =>
                         msg.from === 'bot' ?
                             <div key={i} className="flex sm:gap-7 gap-3 bg-transparent">
@@ -125,23 +218,35 @@ export default function ChatSection() {
                                         <div id="diagram-container"
                                             dangerouslySetInnerHTML={{
                                                 //@ts-expect-error, working well
-                                                __html: msg.content.svgDiagram as string , 
+                                                __html: msg.content.svgDiagram as string,
                                             }} />
                                     </div>}
-                                    <p className="text-gray-800">
-                                        {msg.content.text}
+
+                                    <p id={msg.content.fallbackText ? "" : "typing-text"} className=" text-gray-800 break-all">
+                                        {msg.content.fallbackText}
                                     </p>
-                                   {msg.content.svgDiagram && <div className="mt-2 flex gap-2">
-                                        <button className="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1">
+                                    {msg.content.svgDiagram && <div className="mt-2 flex gap-2">
+                                        <Download
+                                            //@ts-expect-error, working well
+                                            onClick={() => downloadDiagram(msg.content.svgDiagram as string)}
+                                            className="w-5 text-gray-500 hover:text-black transition" />
+                                        <button onClick={() => generateSummary(msg.content.mermaidCode, msg.content.inputText, msg.id)} className="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1">
                                             <Sparkles className="w-4 h-4" /> Generate Summary
                                         </button>
+                                    </div>}
+                                    <div className=""></div>
+                                   {msg.content.summary && <div className="mt-4">
+                                        <p className="font-semibold underline text-xl ">Summary</p>
+                                        <Markdown className="text-gray-800 mt-2 pl-4">
+                                            {msg.content.summary}
+                                        </Markdown>
                                     </div>}
                                 </div>
                             </div>
                             :
                             <div key={i} className="flex sm:gap-7 gap-3 bg-white rounded-[107px] rounded-tr-[23px] p-3 w-fit self-end">
                                 <p className="text-gray-800">
-                                    {msg.content.text}
+                                    {msg.content.fallbackText}
                                 </p>
 
                             </div>
@@ -186,7 +291,7 @@ export default function ChatSection() {
                             onInput={(e) => {
                                 const textarea = e.target as HTMLTextAreaElement;
                                 textarea.style.height = "auto"; // Reset height
-                                textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height
+                                textarea.style.height = `${textarea.scrollHeight} px`; // Adjust height
                             }}
                         ></textarea>
 
