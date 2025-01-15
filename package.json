@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ilovepdf/ilovepdf-nodejs": "^0.3.0",
     "@resvg/resvg-js": "^2.6.2",
     "canvg": "^4.0.2",
     "lucide-react": "^0.471.0",
@@ -18,7 +19,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
-    "react-markdown": "^9.0.3"
+    "react-markdown": "^9.0.3",
+    "tesseract.js": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

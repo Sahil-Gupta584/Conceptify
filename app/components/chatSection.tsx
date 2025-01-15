@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "./Loader";
 import Markdown from "react-markdown";
+import convertor from "../lib/converter";
 
 type TFormField = {
     textInput: string;
@@ -65,16 +66,18 @@ export default function ChatSection() {
         setMessages(prev => [...prev, { id: Math.floor(Math.random() * 999999), from: 'user', content: { inputText: data.textInput } }] as TMessage[])
         setIsLoading(true)
         setValue("textInput", "");
-        setValue("imageInput", null);
-
+        const url: string = URL.createObjectURL(data.imageInput[0]);
+        console.log('url', url);
+        
+        const text = await convertor(url);
+        console.log(text);
+        
         const formdata = new FormData();
         formdata.append("textInput", data.textInput);
-
-        if (data.imageInput) {
-            Array.from(data.imageInput).forEach((file, i) =>
-                formdata.append(`imageInput${i + 1} `, file)
-            );
-        }
+        console.log('data', data);
+        console.log(data.imageInput[0]);
+        
+        if(data.imageInput) formdata.append("imageInput", data.imageInput[0])
 
         const timestamp = Date.now();
         formdata.append("timestamp", timestamp.toString());
@@ -165,7 +168,7 @@ export default function ChatSection() {
         img.src = `data: image / svg + xml; charset = utf - 8, ${encodeURIComponent(svgContent)} `;
     };
 
-    async function generateSummary(mermaidCode, textInput, messageId) {
+    async function generateSummary(mermaidCode:string, textInput:string, messageId:number) {
         try {
             const formdata = new FormData();
             formdata.append("mermaidCode", mermaidCode);
@@ -272,9 +275,9 @@ export default function ChatSection() {
                                 id="image-upload"
                                 type="file"
                                 accept="image/*"
-                                multiple
                                 className="hidden"
-                                onChange={handleImageUpload}
+                                {...register("imageInput", { required: false })}
+                                // onChange={handleImageUpload}
                             />
                             <button className="p-2 md:hidden text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors">
                                 <Camera className="w-5 h-5" />
@@ -283,7 +286,7 @@ export default function ChatSection() {
 
                         {/* Text Input */}
                         <textarea
-                            {...register("textInput", { required: true })}
+                            {...register("textInput", { required: false})}
                             placeholder="Ask Concept Here..."
                             className="w-full px-px outline-none bg-[#f0f3ff] resize-none overflow-y-auto max-h-[168px]" // 168px = 7 rows
                             rows={1}
