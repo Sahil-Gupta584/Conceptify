@@ -1,6 +1,6 @@
 import { createWorker } from "tesseract.js";
 
-async function convertor (img: string) {
+async function ocrImage (img: string) {
   const worker = await createWorker("eng");
   const ret = await worker.recognize(img);
   const text = ret.data.text;
@@ -8,4 +8,4 @@ async function convertor (img: string) {
   return text;
 };
 
-export default convertor;
+export default ocrImage;

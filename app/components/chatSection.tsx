@@ -1,18 +1,21 @@
 'use client';
 /* eslint-disable react/no-unescaped-entities */
-import { BookOpen, BrainCog, Camera, Download, ImagePlus, Pen, Send, Sparkles } from "lucide-react";
+
+import { BookOpen, BrainCog } from "lucide-react";
 import mermaid, { RenderResult } from "mermaid";
-import { useState } from "react";
+import {  useState } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "./Loader";
-import Markdown from "react-markdown";
-import convertor from "../lib/converter";
+import ocrImage from "../utils/ocrImage";
+import BotMsg from "./botMsg";
+import InputSection from "./inputSection";
 
-type TFormField = {
+
+export type TFormFields = {
     textInput: string;
     imageInput: FileList | null;
 };
-type TMessage = {
+export type TMessage = {
     id: number,
     from: 'bot' | 'user',
     content: {
@@ -25,7 +28,7 @@ type TMessage = {
     }
 }
 export default function ChatSection() {
-    const { register, handleSubmit, setValue, getValues } = useForm<TFormField>();
+    const { register, handleSubmit, setValue, getValues } = useForm<TFormFields>();
     const [messages, setMessages] = useState<TMessage[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
@@ -62,22 +65,26 @@ export default function ChatSection() {
         type();
     };
 
-    const onSubmit = async (data: TFormField) => {
+    const onSubmit = async (data: TFormFields) => {
         setMessages(prev => [...prev, { id: Math.floor(Math.random() * 999999), from: 'user', content: { inputText: data.textInput } }] as TMessage[])
         setIsLoading(true)
         setValue("textInput", "");
-        const url: string = URL.createObjectURL(data.imageInput[0]);
-        console.log('url', url);
-        
-        const text = await convertor(url);
-        console.log(text);
-        
+        let ocrText = "";
+        if (data.imageInput) {
+
+            const url: string = URL.createObjectURL(data.imageInput[0]);
+            console.log('url', url);
+
+            ocrText = await ocrImage(url);
+            console.log(ocrText);
+        }
+
         const formdata = new FormData();
         formdata.append("textInput", data.textInput);
         console.log('data', data);
-        console.log(data.imageInput[0]);
-        
-        if(data.imageInput) formdata.append("imageInput", data.imageInput[0])
+        // console.log(data.imageInput[0]);
+
+        if (data.imageInput) formdata.append("ocrText", ocrText)
 
         const timestamp = Date.now();
         formdata.append("timestamp", timestamp.toString());
@@ -92,10 +99,20 @@ export default function ChatSection() {
             if (!result.ok) throw new Error(result.error)
             console.log('result', result);
 
-            const isValidCode = await mermaid.parse(result.mermaidCode, { suppressErrors: true });
+            let isValidCode = await mermaid.parse(result.mermaidCode, { suppressErrors: true });
+            console.log('isValidCode', isValidCode);
+
+            if (!isValidCode) {
+                result.mermaidCode = result.mermaidCode.replaceAll(`[`, `["`)
+                result.mermaidCode = result.mermaidCode.replaceAll(`]`, `"]`)
+                isValidCode = await mermaid.parse(result.mermaidCode, { suppressErrors: true });
+                console.log();
+
+            }
             const svgDiagram: RenderResult | null = isValidCode
                 ? await mermaid.render("diagram", result.mermaidCode)
                 : null;
+            console.log(svgDiagram);
 
             setMessages(prev => [
                 ...prev,
@@ -133,42 +150,11 @@ export default function ChatSection() {
         }
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 2) {
-            alert("You can only upload up to 2 images.");
-            e.target.value = ""; // Clear invalid selection
-        } else {
-            setValue("imageInput", files);
-        }
-    };
 
 
+    console.log(messages);
 
-    const downloadDiagram = (svgContent: string) => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        const img = new Image();
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            // Draw the SVG onto the canvas
-            ctx?.drawImage(img, 0, 0);
-
-            const link = document.createElement("a");
-            link.href = canvas.toDataURL("image/png");
-            link.download = "diagram.png";
-            document.body.appendChild(link);
-            link.click();
-
-            document.body.removeChild(link);
-        };
-        img.src = `data: image / svg + xml; charset = utf - 8, ${encodeURIComponent(svgContent)} `;
-    };
-
-    async function generateSummary(mermaidCode:string, textInput:string, messageId:number) {
+    async function generateSummary(mermaidCode: string, textInput: string, messageId: number) {
         try {
             const formdata = new FormData();
             formdata.append("mermaidCode", mermaidCode);
@@ -178,7 +164,6 @@ export default function ChatSection() {
                 body: formdata
             })
             const result = await res.json()
-            console.log('summresult', result);
             if (!result.ok) throw new Error(result.error)
 
             setMessages(prev => prev.map((msg) => msg.id === messageId ? { ...msg, content: { ...msg.content, summary: result.summary } } : msg))
@@ -187,6 +172,9 @@ export default function ChatSection() {
         }
     }
 
+
+    
+   
     return (
         <div className="bg-gray-400 h-screen flex items-center justify-center">
             <div className="flex flex-col md:w-fit md:h-[89%] h-full w-full">
@@ -212,104 +200,20 @@ export default function ChatSection() {
 
                     {messages.map((msg, i) =>
                         msg.from === 'bot' ?
-                            <div key={i} className="flex sm:gap-7 gap-3 bg-transparent">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0">
-                                    <BrainCog className="w-5 h-5 text-white" />
-                                </div>
-                                <div className="flex-1">
-                                    {msg.content.svgDiagram && <div className="flex-1 overflow-y-auto sm:p-6 p-3 max-w-3xl mx-auto space-y-6 bg-[#f0f3ff]">
-                                        <div id="diagram-container"
-                                            dangerouslySetInnerHTML={{
-                                                //@ts-expect-error, working well
-                                                __html: msg.content.svgDiagram as string,
-                                            }} />
-                                    </div>}
-
-                                    <p id={msg.content.fallbackText ? "" : "typing-text"} className=" text-gray-800 break-all">
-                                        {msg.content.fallbackText}
-                                    </p>
-                                    {msg.content.svgDiagram && <div className="mt-2 flex gap-2">
-                                        <Download
-                                            //@ts-expect-error, working well
-                                            onClick={() => downloadDiagram(msg.content.svgDiagram as string)}
-                                            className="w-5 text-gray-500 hover:text-black transition" />
-                                        <button onClick={() => generateSummary(msg.content.mermaidCode, msg.content.inputText, msg.id)} className="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1">
-                                            <Sparkles className="w-4 h-4" /> Generate Summary
-                                        </button>
-                                    </div>}
-                                    <div className=""></div>
-                                   {msg.content.summary && <div className="mt-4">
-                                        <p className="font-semibold underline text-xl ">Summary</p>
-                                        <Markdown className="text-gray-800 mt-2 pl-4">
-                                            {msg.content.summary}
-                                        </Markdown>
-                                    </div>}
-                                </div>
-                            </div>
+                           
+                            <BotMsg key={i} msg={msg} generateSummary={generateSummary} />
                             :
                             <div key={i} className="flex sm:gap-7 gap-3 bg-white rounded-[107px] rounded-tr-[23px] p-3 w-fit self-end">
                                 <p className="text-gray-800">
-                                    {msg.content.fallbackText}
+                                    {msg.content.inputText}
                                 </p>
-
                             </div>
                     )}
                     {isLoading && <Loader />}
                 </div>
 
                 {/* Input Area */}
-                <div className="bg-[#f0f3ff] p-6 rounded-b-2xl">
-                    <form
-                        className="max-w-3xl gap-2 flex items-center border-[1px] rounded-2xl border-purple-500 p-2"
-                        onSubmit={handleSubmit(onSubmit)}
-                    >
-                        {/* Image Upload */}
-                        <div className="flex items-center self-end">
-                            <label
-                                htmlFor="image-upload"
-                                className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer"
-                            >
-                                <ImagePlus className="w-5 h-5" />
-                            </label>
-                            <input
-                                id="image-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                {...register("imageInput", { required: false })}
-                                // onChange={handleImageUpload}
-                            />
-                            <button className="p-2 md:hidden text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors">
-                                <Camera className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        {/* Text Input */}
-                        <textarea
-                            {...register("textInput", { required: false})}
-                            placeholder="Ask Concept Here..."
-                            className="w-full px-px outline-none bg-[#f0f3ff] resize-none overflow-y-auto max-h-[168px]" // 168px = 7 rows
-                            rows={1}
-                            onKeyDown={handleKeyDown}
-                            onInput={(e) => {
-                                const textarea = e.target as HTMLTextAreaElement;
-                                textarea.style.height = "auto"; // Reset height
-                                textarea.style.height = `${textarea.scrollHeight} px`; // Adjust height
-                            }}
-                        ></textarea>
-
-                        {/* Submit Button */}
-                        <button
-                            type="submit"
-                            className="self-end p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-colors"
-                        >
-                            <Send className="w-5 h-5" />
-                        </button>
-                    </form>
-                    <p className="mt-2 text-xs text-gray-500 text-center">
-                        Tip: You can upload images of handwritten notes or paste text directly
-                    </p>
-                </div>
+                <InputSection handleKeyDown={handleKeyDown} handleSubmit={handleSubmit } onSubmit={onSubmit} register={register}  />
             </div>
         </div>
     );
