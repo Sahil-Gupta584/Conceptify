@@ -1,7 +1,5 @@
-import ILovePDFApi from "@ilovepdf/ilovepdf-nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import Tesseract, { createWorker } from "tesseract.js";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,11 +19,13 @@ export async function POST(req: NextRequest) {
     const timestamp = Number(formdata.get("timestamp"));
     const itsHashedBro = formdata.get("itsHashedBro");
     console.log("formdata", formdata);
+    // console.log('(ocrText && textInput)',(ocrText && textInput));
+    // console.log('(textInput && ocrText)',(textInput && ocrText));
 
-    if ((ocrText && textInput) || (!ocrText && !textInput)) {
+    if (!ocrText && !textInput) {
       return NextResponse.json({
         ok: false,
-        error: "Provide either 'ocrText' or 'textInput', but not both or none.",
+        error: "Provide either 'ocrText' or 'textInput'.",
         status: 400,
       });
     }
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
         status: 500,
       });
 
-    let fallbackText ='';
+    let fallbackText = "";
     if (!apiResult.result.mermaidCode) {
       const client = new OpenAI({
         baseURL: OpenAiBaseUrl,
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       });
       console.log("res", res.choices);
 
-      fallbackText = res.choices[0].message.content||'';
+      fallbackText = res.choices[0].message.content || "";
     }
 
     return NextResponse.json({
@@ -91,21 +91,21 @@ export async function POST(req: NextRequest) {
       mermaidCode: apiResult.result.mermaidCode,
       fallbackText,
     });
-    console.log("textInput", textInput);
-    if (textInput === "d") {
-      return NextResponse.json({
-        ok: true,
-        mermaidCode:
-          "flowchart TD\n    A[Charge] -->|Type| B[Negative]\n    A -->|Type| C[Positive]",
-      });
-    }
-    if (textInput === "nd") {
-      return NextResponse.json({
-        ok: true,
-        fallbackText:
-          "fineaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      });
-    }
+    //   console.log("textInput", textInput);
+    //   if (textInput === "d") {
+    //     return NextResponse.json({
+    //       ok: true,
+    //       mermaidCode:
+    //         "flowchart TD\n    A[Charge] -->|Type| B[Negative]\n    A -->|Type| C[Positive]",
+    //     });
+    //   }
+    //   if (textInput === "nd") {
+    //     return NextResponse.json({
+    //       ok: true,
+    //       fallbackText:
+    //         "fineaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    //     });
+    //   }
   } catch (error) {
     console.error("Error processing request:", error);
     return NextResponse.json({ ok: false, error: error, status: 500 });

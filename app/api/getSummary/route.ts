@@ -9,6 +9,9 @@ export async function POST(req: NextRequest) {
     const formdata = await req.formData();
     const textInput = formdata.get("textInput");
     const mermaidCode = formdata.get("mermaidCode");
+    console.log("formdata", formdata);
+
+    console.log(mermaidCode || textInput);
 
     if (!textInput || !mermaidCode)
       return NextResponse.json({
@@ -24,7 +27,12 @@ export async function POST(req: NextRequest) {
       model: "gpt-4o",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: `Give simple ,effective, easy to memorize, summary of the this  diagram >   ${mermaidCode}` },
+        {
+          role: "user",
+          content: `Give simple ,effective, easy to memorize, summary of the this  diagram >   ${
+            mermaidCode || textInput
+          } `,
+        },
       ],
       temperature: 0.7,
       max_tokens: 1000,
