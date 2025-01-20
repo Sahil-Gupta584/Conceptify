@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Mail, MessageSquarePlus } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { handleMagicLink } from '../utils/actions';
+import { handleGoogleAuth, handleMagicLink } from '../utils/actions';
 
 function AuthPage() {
   const [email, setEmail] = useState('');
@@ -79,7 +79,7 @@ console.log('data',data);
               <button
                 type="button"
                 className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                onClick={() => router.push('/')}
+                onClick={() => handleGoogleAuth()}
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path

@@ -5,9 +5,7 @@ import { Messages } from "./model";
 import { dbConnect } from "./db";
 
 export async function handleMagicLink(email: string) {
-  await signIn("nodemailer", {
-    redirectTo: "/",
-  });
+  await signIn("nodemailer", {redirectTo: "/",email});
 }
 
 export async function handleGoogleAuth() {
