@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import Google from "next-auth/providers/google";
 import Nodemailer from "next-auth/providers/nodemailer";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import client from "./app/utils/db";
+import {client} from "./app/utils/db";
 
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -33,6 +33,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         signIn: '/auth',
     },
     callbacks: {
+        session:({session,token})=>{
+            console.log('session',session);
+            console.log('token',token);
+            
+            return {...session,user: {...session.user,id: token.sub},}
+        }
         // signIn: async ({ user, account, }) => {
         //     console.log('AuthProvider:', account.provider);
 

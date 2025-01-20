@@ -59,15 +59,13 @@ export default function InputSection({ setIsLoading, setMessages }: TInputSectio
         setIsSubmitted(true)
         setTextInput("");
 
-        console.log('data', textInput);
-        const userNewMsg: TMessage = {
-            id: Math.floor(Math.random() * 999999),
+        const userNewMsg: Omit<TMessage, '_id'> = {
             from: 'user',
             content: { inputText: textInput, image: inputImage ? inputImage.url : null, fallbackText: '', mermaidCode: '', summary: '' }
         }
-        setMessages(prev => [...prev, userNewMsg] as TMessage[])
         uploadMessage(userNewMsg).then(() => console.log('msg uploaded successfully')).catch(err => console.log(err))
 
+        setMessages(prev => [...prev, userNewMsg] as TMessage[])
         setIsLoading(true)
 
         const formdata = new FormData();
@@ -93,7 +91,6 @@ export default function InputSection({ setIsLoading, setMessages }: TInputSectio
             console.log('result', result);
 
             let isValidCode = await mermaid.parse(result.mermaidCode, { suppressErrors: true });
-            console.log('isValidCode', isValidCode);
 
             if (!isValidCode) {
                 result.mermaidCode = result.mermaidCode.replaceAll(`[`, `["`)
@@ -105,12 +102,13 @@ export default function InputSection({ setIsLoading, setMessages }: TInputSectio
             const svgDiagram: RenderResult | null = isValidCode
                 ? await mermaid.render(`mermaid-diagram-${Date.now()}-${Math.floor(Math.random() * 999999)}`, result.mermaidCode)
                 : null;
-            console.log(svgDiagram);
 
-            setMessages((prev: TMessage[]) => [
-                ...prev,
-                { id: Math.floor(Math.random() * 99999999), from: "bot", content: { inputText: textInput, fallbackText: "", svgDiagram: svgDiagram?.svg, mermaidCode: result.mermaidCode } }
-            ] as TMessage[]);
+            const botNewMsg: Omit<TMessage, '_id'> = {
+                from: "bot",
+                content: { inputText: textInput, fallbackText: "", svgDiagram: svgDiagram?.svg, mermaidCode: result.mermaidCode, summary: '' }
+            }
+            setMessages((prev) => [...prev, botNewMsg] as TMessage[]);
+            uploadMessage(botNewMsg).then(() => console.log('msg uploaded successfully')).catch(err => console.log(err))
 
             typewriter(result.fallbackText, () => {
                 setMessages(prev =>

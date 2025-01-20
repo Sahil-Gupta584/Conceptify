@@ -8,11 +8,12 @@ import { handleMagicLink } from '../utils/actions';
 function AuthPage() {
   const [email, setEmail] = useState('');
   const router = useRouter()
-  const { status } = useSession();
+  const { status,data } = useSession();
+console.log('data',data);
 
-  if (status === 'authenticated') {
-    router.push('/')
-  }
+  // if (status === 'authenticated') {
+  //   router.push('/')
+  // }
   
   //@ts-expect-error, this is a valid function
   const handleSubmit = (e) => {

@@ -2,10 +2,11 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import { BookOpen, BrainCog } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loader from "./Loader";
 import BotMsg from "./botMsg";
 import InputSection from "./inputSection";
+import { getMessages } from "../utils/actions";
 
 
 export type TFormFields = {
@@ -14,7 +15,8 @@ export type TFormFields = {
 };
 
 export type TMessage = {
-    id: number,
+    __v?:number,
+    _id:string,
     from: 'bot' | 'user',
     content: {
         fallbackText: string,
@@ -28,7 +30,19 @@ export type TMessage = {
 export default function ChatSection() {
     const [messages, setMessages] = useState<TMessage[]>([])
     const [isLoading, setIsLoading] = useState(false)
-   
+
+    useEffect(() => {
+        (async () => {
+
+            const res = await getMessages()
+            console.log('res',res);
+            console.log('parsed',JSON.parse(res));
+            setMessages(JSON.parse(res))
+            
+        })()
+
+    }, [])
+
     console.log('messages', messages);
 
     return (
