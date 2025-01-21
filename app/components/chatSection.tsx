@@ -7,7 +7,8 @@ import Loader from "./Loader";
 import BotMsg from "./botMsg";
 import InputSection from "./inputSection";
 import { getMessages } from "../utils/actions";
-
+import Avatar from'./avatar'
+import { useSession } from "next-auth/react";
 
 export type TFormFields = {
     textInput: string;
@@ -30,7 +31,9 @@ export type TMessage = {
 export default function ChatSection() {
     const [messages, setMessages] = useState<TMessage[]>([])
     const [isLoading, setIsLoading] = useState(false)
-
+  const { data,status } = useSession();
+    console.log('user',status);
+    
     useEffect(() => {
         (async () => {
 
@@ -49,11 +52,12 @@ export default function ChatSection() {
         <div className="bg-[#ededed] h-screen flex items-center justify-center">
             <div className="flex flex-col md:w-fit md:h-[89%] h-full w-full shadow-[0px_11px_155px_-72px_gray] md:rounded-2xl">
                 {/* Chat Header */}
-                <div className="h-16 border-b bg-white/50 md:rounded-t-2xl flex items-center px-6">
+                <div className="h-16 border-b bg-white/50 md:rounded-t-2xl flex items-center justify-between px-6">
                     <div className="flex items-center gap-2">
                         <BookOpen className="w-5 h-5 text-indigo-600" />
                         <span className="font-medium text-gray-700">Current Study Session</span>
                     </div>
+                    {/* <Avatar user={data?.user} /> */}
                 </div>
 
                 {/* Messages Area */}

@@ -5,7 +5,7 @@ import { Messages } from "./model";
 import { dbConnect } from "./db";
 
 export async function handleMagicLink(email: string) {
-  await signIn("nodemailer", {redirectTo: "/",email});
+  await signIn("nodemailer", { redirectTo: "/", email });
 }
 
 export async function handleGoogleAuth() {
@@ -18,10 +18,9 @@ export async function logOut() {
 
 export async function uploadMessage(message: Omit<TMessage, "_id">) {
   try {
-    console.log('message to upload:',message);
-    
-    const res = await dbConnect();
-    console.log("connectRes", res);
+    console.log("message to upload:", message);
+
+    await dbConnect();
     const session = await auth();
 
     const msg = await Messages.create({ user: session?.user?.id, ...message });
@@ -35,13 +34,9 @@ export async function uploadMessage(message: Omit<TMessage, "_id">) {
 export async function getMessages() {
   try {
     const session = await auth();
-    console.log('session',session)
-    console.log("useId", session?.user?.id);
-    const res = await dbConnect();
-    console.log("connectRes", res);
+    await dbConnect();
 
     const msgs = await Messages.find({ user: session?.user?.id });
-    console.log("all msg", msgs);
     return JSON.stringify(msgs);
   } catch (error) {
     console.log("error uploadingMsg", error);
