@@ -34,13 +34,10 @@ if (process.env.NODE_ENV === "development") {
   client = new MongoClient(uri, options)
 }
  
- async function dbConnect() {
-  try {
-      await mongoose.connect(uri)
-      console.log('MongoDB connected')
-  } catch (error) {
-      console.log(error, 'error in dbConnect');
-      throw error
+async function dbConnect() {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(uri)
+    console.log("MongoDB connected");
   }
 }
 

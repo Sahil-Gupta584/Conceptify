@@ -1,12 +1,11 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
   try {
     const diagramApiUrl = process.env.DIAGRAM_API_URL;
-    const openAiApiKey = process.env.OPENAI_API_KEY;
-    const OpenAiBaseUrl = process.env.OPENAI_BASE_URL;
-    if (!diagramApiUrl || !openAiApiKey || !OpenAiBaseUrl)
+  const geminiKey = process.env.GEMINI_KEY
+    if (!diagramApiUrl || !geminiKey)
       return NextResponse.json({
         ok: false,
         error: "Invalid env's",
@@ -19,8 +18,6 @@ export async function POST(req: NextRequest) {
     const timestamp = Number(formdata.get("timestamp"));
     const itsHashedBro = formdata.get("itsHashedBro");
     console.log("formdata", formdata);
-    // console.log('(ocrText && textInput)',(ocrText && textInput));
-    // console.log('(textInput && ocrText)',(textInput && ocrText));
 
     if (!ocrText && !textInput) {
       return NextResponse.json({
@@ -68,22 +65,15 @@ export async function POST(req: NextRequest) {
 
     let fallbackText = "";
     if (!apiResult.result.mermaidCode) {
-      const client = new OpenAI({
-        baseURL: OpenAiBaseUrl,
-        apiKey: openAiApiKey,
-      });
-      const res = await client.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: textInput as string },
-        ],
-        temperature: 0.7,
-        max_tokens: 1000,
-      });
-      console.log("res", res.choices);
+              const genAI = new GoogleGenerativeAI(geminiKey);
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      
+          const result = await model.generateContent(textInput as string);
+          const response = result.response;
+          const text = response.text();
+          console.log("text", text);
 
-      fallbackText = res.choices[0].message.content || "";
+      fallbackText = text;
     }
 
     return NextResponse.json({
@@ -91,8 +81,8 @@ export async function POST(req: NextRequest) {
       mermaidCode: apiResult.result.mermaidCode,
       fallbackText,
     });
-    //   console.log("textInput", textInput);
-    //   if (textInput === "d") {
+    //   Dummy response 
+    //     //   if (textInput === "d") {
     //     return NextResponse.json({
     //       ok: true,
     //       mermaidCode:

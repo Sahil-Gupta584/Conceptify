@@ -1,32 +1,33 @@
 'use client';
 import { useState } from 'react';
-import { Mail, MessageSquarePlus } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { handleGoogleAuth, handleMagicLink } from '../utils/actions';
-
+import { LuMail } from 'react-icons/lu';
+import logo from "@/public/logo.svg";
 function AuthPage() {
   const [email, setEmail] = useState('');
   const router = useRouter()
-  const { status, data, } = useSession();
+  const { data, status } = useSession();
   console.log('data', data);
 
-  // if (status === 'authenticated') {
-  //   router.push('/')
-  // }
+  if (status === 'authenticated') {
+    router.push('/')
+  }
 
   //@ts-expect-error, this is a valid function
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    handleMagicLink(e.target.email.value)
+    console.log('submitted');
+
+    await handleMagicLink(e.target.email.value)
   };
 
   return (
     <div className="min-h-screen bg-[#ededed] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <MessageSquarePlus className="h-12 w-12 text-indigo-600" />
-        </div>
+          <img src={logo.src} alt="Logo" className="w-16 h-16 text-indigo-600" />        </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Sign in to your account
         </h2>
@@ -41,7 +42,7 @@ function AuthPage() {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <LuMail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="email"

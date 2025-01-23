@@ -10,6 +10,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            allowDangerousEmailAccountLinking:true
         }),
         Nodemailer({
             server: {
@@ -38,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     callbacks: {
         async jwt({ token, user, trigger, session }) {
-            console.log({ 'token':token, 'user':user, 'trigger':trigger, 'session':session });
+            // console.log({ 'token':token, 'user':user, 'trigger':trigger, 'session':session });
             
             // Initial sign in
             if (user) {

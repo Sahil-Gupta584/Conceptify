@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Define the linear gradient -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366F1; stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED; stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Use the gradient in the fill -->
+  <path
+    d="
+      M20 15
+      L70 15
+      Q80 15, 80 25
+      L80 75
+      Q80 85, 70 85
+      L20 85
+      Q10 85, 10 75
+      L10 25
+      Q10 15, 20 15
+      Z"
+    fill="url(#gradient)" className="fill"/>
+    
+  <path
+    d="
+      M15 25 L20 25
+      M15 35 L20 35
+      M15 45 L20 45
+      M15 55 L20 55
+      M15 65 L20 65
+      M15 75 L20 75"
+    stroke="white"
+    stroke-width="3"
+    stroke-linecap=""/>
+    
+  <circle cx="45" cy="40" r="8" fill="white"/>
+  <circle cx="65" cy="30" r="6" fill="white"/>
+  <circle cx="65" cy="50" r="6" fill="white"/>
+  <circle cx="65" cy="70" r="6" fill="white"/>
+  
+  <path
+    d="
+      M45 40 L65 30
+      M45 40 L65 50
+      M45 40 L65 70"
+    stroke="white"
+    stroke-width="2"
+    stroke-linecap="round"/>
+</svg>
