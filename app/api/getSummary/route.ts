@@ -1,49 +1,39 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
-  const openAiApiKey = process.env.OPENAI_API_KEY;
-  const OpenAiBaseUrl = process.env.OPENAI_BASE_URL;
-
+const geminiKey = process.env.GEMINI_KEY
+if(!geminiKey) return NextResponse.json({status: 400, ok: false, error: "Invalid env's",})
   try {
     const formdata = await req.formData();
     const textInput = formdata.get("textInput");
     const mermaidCode = formdata.get("mermaidCode");
     console.log("formdata", formdata);
 
-    console.log(mermaidCode || textInput);
-
-    if (!textInput || !mermaidCode)
+    if (!textInput && !mermaidCode)
       return NextResponse.json({
         status: 400,
         ok: false,
         error: "Invalid input",
       });
-    const client = new OpenAI({
-      baseURL: OpenAiBaseUrl,
-      apiKey: openAiApiKey,
-    });
-    const res = await client.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        {
-          role: "user",
-          content: `Give simple ,effective, easy to memorize, summary of the this  diagram >   ${
-            mermaidCode || textInput
-          } `,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 1000,
-    });
-    console.log("res", res.choices);
 
-    // fallbackText = res.choices[0].message.content;
+
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const result = await model.generateContent(
+      `Give simple ,effective, easy to memorize,and in the form of markdown, summary of the this diagram >${
+        mermaidCode || textInput
+      } `
+    );
+    const response = result.response;
+    const text = response.text();
+    console.log("text", text);
+    
     return NextResponse.json({
       status: 200,
       ok: true,
-      summary: res.choices[0].message.content,
+      summary: text,
     });
   } catch (error) {
     console.log("error", error);

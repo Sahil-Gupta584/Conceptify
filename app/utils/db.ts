@@ -1,4 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
+import mongoose from "mongoose";
 
 if (!process.env.MONGODB_URL) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URL"');
@@ -33,6 +34,13 @@ if (process.env.NODE_ENV === "development") {
   client = new MongoClient(uri, options)
 }
  
+async function dbConnect() {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(uri)
+    console.log("MongoDB connected");
+  }
+}
+
 // Export a module-scoped MongoClient. By doing this in a
 // separate module, the client can be shared across functions.
-export default client
+export  {client,dbConnect}
