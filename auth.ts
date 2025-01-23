@@ -23,9 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 },
             },
             from: 'guptas3067@gmail.com',
-            // Generate a custom magic link page
             generateVerificationToken: async () => {
-                // You can customize token generation here
                 return Math.random().toString(36).slice(2);
             },
         }),
@@ -48,14 +46,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 
                 // For email users, set default values if they don't exist
                 if (!token.picture) {
-                    token.picture = `/api/placeholder/100/100`; // Default avatar
+                    token.picture = `https://api.multiavatar.com/${token.name}.svg`; // Default avatar
                 }
                 if (!token.name) {
                     token.name = user.email?.split('@')[0]; // Use part of email as name
                 }
             }
 
-            // Handle user updates
             if (trigger === "update" && session) {
                 token.name = session.name;
                 token.picture = session.picture;
@@ -83,7 +80,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             $set: {
                                 email: user.email,
                                 name: user.email?.split('@')[0], // Default name from email
-                                image: `/api/placeholder/100/100`, // Default avatar
+                                image:`https://api.multiavatar.com/${user.name}.svg`, // Default avatar
                                 updatedAt: new Date(),
                             },
                             $setOnInsert: {

@@ -5,6 +5,7 @@ import mermaid, { RenderResult } from "mermaid";
 import ocrImage from "../utils/ocrImage";
 import React, { useState } from "react";
 import { uploadMessage } from "../utils/actions";
+import { useRouter } from "next/navigation";
 
 
 type TInputSection = {
@@ -22,6 +23,7 @@ export default function InputSection({ setIsLoading, setMessages, typewriter }: 
     const [inputImage, setInputImage] = useState<null | TInputImage>(null)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [textInput, setTextInput] = useState("");
+  const router = useRouter()
 
     const onSubmit = async (textInput: string) => {
         try {
@@ -69,7 +71,10 @@ export default function InputSection({ setIsLoading, setMessages, typewriter }: 
             });
             const result = await res.json();
             // console.log('result', result);
-            if (!result.ok) throw new Error(result.error)
+            if (!result.ok) {
+                if(result.status===401) router.push('/auth')
+                throw new Error(result.error)
+            }
 
             let isValidCode = await mermaid.parse(result.mermaidCode, { suppressErrors: true });
 

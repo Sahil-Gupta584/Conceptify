@@ -1,19 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { handleGoogleAuth, handleMagicLink } from '../utils/actions';
-import { LuMail } from 'react-icons/lu';
 import logo from "@/public/logo.svg";
+import { Mail } from 'lucide-react';
 function AuthPage() {
   const [email, setEmail] = useState('');
   const router = useRouter()
   const { data, status } = useSession();
   console.log('data', data);
 
-  if (status === 'authenticated') {
-    router.push('/')
-  }
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/')
+    }
+  }, [status, router]);
 
   //@ts-expect-error, this is a valid function
   const handleSubmit = async (e) => {
@@ -42,7 +44,7 @@ function AuthPage() {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <LuMail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   id="email"

@@ -1,10 +1,15 @@
+import { auth } from "@/auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    console.log("session", session);
+    if(!session?.user)return NextResponse.json({error:'unauthenticated',ok:false,status:401});
+
     const diagramApiUrl = process.env.DIAGRAM_API_URL;
-  const geminiKey = process.env.GEMINI_KEY
+    const geminiKey = process.env.GEMINI_KEY;
     if (!diagramApiUrl || !geminiKey)
       return NextResponse.json({
         ok: false,
@@ -65,13 +70,13 @@ export async function POST(req: NextRequest) {
 
     let fallbackText = "";
     if (!apiResult.result.mermaidCode) {
-              const genAI = new GoogleGenerativeAI(geminiKey);
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-          const result = await model.generateContent(textInput as string);
-          const response = result.response;
-          const text = response.text();
-          console.log("text", text);
+      const genAI = new GoogleGenerativeAI(geminiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const result = await model.generateContent(textInput as string);
+      const response = result.response;
+      const text = response.text();
+      console.log("text", text);
 
       fallbackText = text;
     }
@@ -81,7 +86,7 @@ export async function POST(req: NextRequest) {
       mermaidCode: apiResult.result.mermaidCode,
       fallbackText,
     });
-    //   Dummy response 
+    //   Dummy response
     //     //   if (textInput === "d") {
     //     return NextResponse.json({
     //       ok: true,

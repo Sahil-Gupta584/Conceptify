@@ -1,11 +1,12 @@
-import { BrainCog } from "lucide-react"
+import logo from "@/public/logo.svg";
 
 export default function Loader() {
     return <>
         <div className="flex sm:gap-7 gap-3 bg-transparent items-center">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0">
-                <BrainCog className="w-5 h-5 text-white" />
+             <div className=" ">
+                <img src={logo.src} alt="Logo" className="w-12 h-12 text-indigo-600" />
             </div>
+
             
             <div className="relative w-6 h-6">
                 <div className="absolute inset-0 border-2 border-purple-600 border-dashed rounded-full animate-spin opacity-2000k0" />

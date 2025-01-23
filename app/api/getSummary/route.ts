@@ -1,10 +1,15 @@
+import { auth } from "@/auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-const geminiKey = process.env.GEMINI_KEY
-if(!geminiKey) return NextResponse.json({status: 400, ok: false, error: "Invalid env's",})
   try {
+    const session = await auth();
+    if (!session?.user) return NextResponse.json({ error: "unauthenticated", ok: false, status: 401 });
+
+    const geminiKey = process.env.GEMINI_KEY;
+    if (!geminiKey)return NextResponse.json({ status: 400, ok: false, error: "Invalid env's" });
+
     const formdata = await req.formData();
     const textInput = formdata.get("textInput");
     const mermaidCode = formdata.get("mermaidCode");
@@ -17,7 +22,6 @@ if(!geminiKey) return NextResponse.json({status: 400, ok: false, error: "Invalid
         error: "Invalid input",
       });
 
-
     const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -29,7 +33,7 @@ if(!geminiKey) return NextResponse.json({status: 400, ok: false, error: "Invalid
     const response = result.response;
     const text = response.text();
     console.log("text", text);
-    
+
     return NextResponse.json({
       status: 200,
       ok: true,

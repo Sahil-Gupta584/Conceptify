@@ -4,8 +4,9 @@ import { TMessage } from "./chatSection"
 import html2canvas from "html2canvas";
 import { Download, Sparkles } from "lucide-react";
 import Markdown from "react-markdown";
-import { updateSummary } from "../utils/actions";
 import logo from "@/public/logo.svg";
+import { useRouter } from "next/navigation";
+
 type TBotMsgProps = {
     msg: TMessage,
     setMessages: React.Dispatch<React.SetStateAction<TMessage[]>>;
@@ -17,6 +18,7 @@ export default function BotMsg({ msg, setMessages, typedText, isTyping, messages
     const diagramRef = useRef(null);
     const [isGeneratingSummary, setIsGeneratingSummary] = useState(false)
     const [partialSummary, setPartialSummary] = useState("");
+    const router = useRouter()
 
     const typewriter = (
         text: string,
@@ -54,8 +56,10 @@ export default function BotMsg({ msg, setMessages, typedText, isTyping, messages
 
             const result = await res.json()
             // console.log('res', result);
-            if (!result.ok) throw new Error(result.error)
-
+            if (!result.ok) {
+                if(result.status===401) router.push('/auth')
+                throw new Error(result.error)
+            }
 
             setMessages((prev) => prev.map((msg) =>
                 msg._id === messageId
@@ -76,7 +80,6 @@ export default function BotMsg({ msg, setMessages, typedText, isTyping, messages
 
 
             setIsGeneratingSummary(false)
-            await updateSummary(messageId, result.summary)
         } catch (error) {
             console.error("Error generating summary:", error);
             setIsGeneratingSummary(false)

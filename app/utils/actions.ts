@@ -62,12 +62,4 @@ export async function getMessages() {
   }
 }
 
-export async function updateSummary(msgId: string, summary: string) {
-  try {
-    await dbConnect();
-    await Messages.updateOne({ _id: msgId }, { $set: { summary } });
-  } catch (error) {
-    console.log("error updating summary", error);
-    throw error;
-  }
-}
+

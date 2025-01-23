@@ -1,8 +1,9 @@
 'use client';
 import { User } from 'next-auth';
 import React, { useState, useRef, useEffect } from 'react';
-import { CgLayoutGrid } from 'react-icons/cg';
 import { logOut } from '../utils/actions';
+import Image from 'next/image';
+import Link from 'next/link';
 
 
 function Avatar({ user }: { user: User | undefined }) {
@@ -11,11 +12,12 @@ function Avatar({ user }: { user: User | undefined }) {
 
   // Close popover when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event:MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
+console.log('user', user);
 
     document.addEventListener('mousedown', handleClickOutside);
   }, []);
@@ -28,7 +30,9 @@ function Avatar({ user }: { user: User | undefined }) {
         className="relative focus:outline-none"
       >
         <div className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all">
-          <img
+          <Image
+            height={40}
+            width={40}
             src={user.image as string}
             alt={user.name as string}
             className="w-full h-full object-cover"
@@ -58,18 +62,23 @@ function Avatar({ user }: { user: User | undefined }) {
 
           {/* Actions Section */}
           <div className="border-t border-gray-200 p-2">
-            <a
-              href="#feedback"
+            <Link
+              href="/feedback"
               className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              <span>Give us feedback 🤗</span>
-            </a>
+              <span>Give us feedback </span>
+            </Link>
+            <Link
+              href="/feedback"
+              className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700 transition-colors"
+            >🆕 &nbsp;Request Feature
+            </Link>
 
             <button
-              onClick={async ()=> logOut()}
+              onClick={async () => logOut()}
               className="w-full flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-red-600 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
