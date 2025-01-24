@@ -8,8 +8,7 @@ import { Mail } from 'lucide-react';
 function AuthPage() {
   const [email, setEmail] = useState('');
   const router = useRouter()
-  const { data, status } = useSession();
-  console.log('data', data);
+  const {  status } = useSession();
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -29,9 +28,10 @@ function AuthPage() {
     <div className="min-h-screen bg-[#ededed] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <img src={logo.src} alt="Logo" className="w-16 h-16 text-indigo-600" />        </div>
+          <img src={logo.src} alt="Logo" className="w-16 h-16 text-indigo-600" />
+        </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Sign in to continue learning
         </h2>
       </div>
 

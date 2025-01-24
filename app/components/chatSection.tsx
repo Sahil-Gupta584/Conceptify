@@ -90,8 +90,6 @@ export default function ChatSection() {
                 </div>
 
                 {/* Messages Area */}
-                {/* <div className="flex-1 overflow-y-auto  p-6 space-y-4 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-blue-300"> */}
-
                 <div className="flex-1 flex flex-col overflow-y-auto sm:p-6 p-3 max-w-3xl mx-auto space-y-6 bg-gray-50 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-blue-300">
                     {/* AI Message */}
                     <div className="flex sm:gap-7 gap-3 bg-transparent">

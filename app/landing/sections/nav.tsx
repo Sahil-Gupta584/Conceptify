@@ -11,7 +11,7 @@ export default function Nav() {
                 {/* Logo */}
                 <div className="flex-shrink-0 flex items-center">
                     <a href="#" className="text-xl font-bold">
-                        StudyGraphix
+                        Conceptify
                     </a>
                 </div>
                 {/* Desktop Menu */}
@@ -45,17 +45,17 @@ export default function Nav() {
                             Testimonials
                         </a>
                         <a
-                            href="#pricing"
+                            href="#faq"
                             className="hover:text-purple-400 transition-colors"
                         >
-                            Pricing
+                            FAQ&apos;s
                         </a>
                         <Link
                             target="_blank"
                             href="/"
                             className="bg-purple-600 px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
                         >
-                         Chat &nbsp;   <ExternalLink className="h-4 w-4 mb-3" /> 
+                         Chat   <ExternalLink className="h-4 w-4 mb-1 inline-block" /> 
                         </Link>
                     </div>
                 </div>

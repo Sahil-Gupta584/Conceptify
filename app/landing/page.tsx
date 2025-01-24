@@ -4,9 +4,7 @@ import Features from "./sections/features"
 import Footer from "./sections/footer"
 import HeroSection from "./sections/hero"
 import Nav from "./sections/nav"
-import Pricing from "./sections/pricing"
 import Testimonials from "./sections/testimonials"
-import TryNow from "./sections/tryNow"
 import Working from "./sections/working"
 
 export default function Page() {
@@ -19,7 +17,7 @@ export default function Page() {
     <Testimonials />
     {/* <Pricing/> */}
     <Faq />
-    <TryNow />
+    {/* <TryNow /> */}
     <Footer />
   </>
 }

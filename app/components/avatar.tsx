@@ -17,7 +17,6 @@ function Avatar({ user }: { user: User | undefined }) {
         setIsOpen(false);
       }
     };
-console.log('user', user);
 
     document.addEventListener('mousedown', handleClickOutside);
   }, []);
@@ -63,7 +62,7 @@ console.log('user', user);
           {/* Actions Section */}
           <div className="border-t border-gray-200 p-2">
             <Link
-              href="/feedback"
+              href="/feedbacks"
               className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,9 +71,14 @@ console.log('user', user);
               <span>Give us feedback </span>
             </Link>
             <Link
-              href="/feedback"
+              href="/feedbacks"
               className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700 transition-colors"
             >🆕 &nbsp;Request Feature
+            </Link>
+            <Link
+              href="/landing"
+              className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700 transition-colors"
+            >🏠 Home
             </Link>
 
             <button
