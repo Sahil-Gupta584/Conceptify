@@ -8,6 +8,7 @@ import { getMessages } from "../utils/actions";
 import Avatar from './avatar'
 import { useSession } from "next-auth/react";
 import logo from "@/public/logo.svg";
+
 export type TFormFields = {
     textInput: string;
     imageInput: FileList | null;

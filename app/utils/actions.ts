@@ -2,7 +2,7 @@
 import { auth, signIn, signOut } from "@/auth";
 import { Feedbacks, Messages } from "./model";
 import { dbConnect } from "./db";
-import { Feedback } from "../feedbacks/page";
+import { Feedback } from "../feedbacks/feedbackPage";
 
 export async function handleMagicLink(email: string) {
   console.log("calling");
