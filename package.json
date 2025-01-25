@@ -11,6 +11,7 @@
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",
     "@google/generative-ai": "^0.21.0",
+    "@vercel/analytics": "^1.4.1",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.471.0",
     "mermaid": "^11.4.1",
