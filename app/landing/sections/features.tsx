@@ -7,7 +7,7 @@ export default function Features() {
                     Transform Your Learning Experience
                 </h2>
                 <p className="text-xl text-neutral-600">
-                    Powerful features designed to make your study sessions more effective
+                    Learn Hare Topics in Seconds
                 </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -1,7 +1,7 @@
-import ChatSection from "./components/chatSection";
+import Wrapper from "./components/chatWrapper";
 
-export default function Home() {
+export default function ChatHome() {
   return (
-   <ChatSection />  
+   <Wrapper />  
   );
 }

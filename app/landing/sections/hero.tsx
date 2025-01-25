@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react";
 
 export default function HeroSection() {
     return (
@@ -6,23 +7,23 @@ export default function HeroSection() {
                 <div className="flex flex-col md:flex-row items-center justify-between py-12 md:py-20">
                     {/* Left Content */}
                     <div className="flex-1 animate__animated animate__fadeInLeft">
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                            Transform Your Notes into
-                            <span className="text-purple-500">Visual Concepts</span>
+                        <h1 className="text-4xl md:text-5xl font-bold mb-6 md:text-start text-center">
+                            Diagrams are shortcuts to 
+                            <span className="text-purple-500">&nbsp; memorize longer!</span>
                         </h1>
                         <p className="text-xl text-gray-300 mb-8">
                             Upload your notes or paste text to instantly generate
                             easy-to-understand diagrams. Learn faster, remember longer.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <button className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
-                                Try Now - It&apos;s Free
+                        <div className="flex flex-col sm:flex-row gap-4 sm:items-start items-center">
+                            <button className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg text-lg font-semibold transition-colors w-full sm:w-fit">
+                            Chat - It&apos;s Free <ExternalLink className=" h-5 w-5 mb-1 inline-block" /> 
                             </button>
-                            <button className="border border-purple-500 hover:bg-purple-900/30 px-8 py-3 rounded-lg text-lg font-semibold transition-colors">
+                            <button className="border border-purple-500 hover:bg-purple-900/30 px-8 py-3 rounded-lg text-lg font-semibold transition-colors w-full sm:w-fit">
                                 Watch Demo
                             </button>
                         </div>
-                        <div className="mt-8 flex items-center gap-4">
+                        <div className="mt-8 flex gap-4 sm:items-start items-center">
                             <div className="flex -space-x-2">
                                 <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
                                     👨‍🎓
@@ -40,8 +41,9 @@ export default function HeroSection() {
                             </p>
                         </div>
                     </div>
+
                     {/* Right Content */}
-                    <div className="flex-1 mt-12 md:mt-0 animate__animated animate__fadeInRight">
+                    <div className="flex-1 mt-12 md:mt-0 animate__animated animate__fadeInRight w-full mx-4 md:mx-0">
                         <div className="bg-neutral-800 p-6 rounded-xl border border-purple-500/30 shadow-2xl shadow-purple-500/10">
                             <div className="flex gap-2 mb-4">
                                 <div className="w-3 h-3 rounded-full bg-red-500" />

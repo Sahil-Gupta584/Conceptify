@@ -9,7 +9,7 @@ export default function TryNow() {
                         {/* Left Content */}
                         <div className="text-white animate__animated animate__fadeInLeft">
                             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                                Try StudyGraphix Right Now
+                                Try Conceptify Right Now
                             </h2>
                             <p className="text-purple-100 text-lg mb-8">
                                 Transform your notes into easy-to-understand diagrams. No sign-up

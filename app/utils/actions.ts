@@ -1,10 +1,11 @@
 "use server";
 import { auth, signIn, signOut } from "@/auth";
-import { Messages } from "./model";
+import { Feedbacks, Messages } from "./model";
 import { dbConnect } from "./db";
+import { Feedback } from "../feedbacks/feedbackPage";
 
 export async function handleMagicLink(email: string) {
-  console.log('calling');
+  console.log("calling");
   await signIn("nodemailer", { redirectTo: "/", email });
 }
 
@@ -13,12 +14,11 @@ export async function handleGoogleAuth() {
 }
 
 export async function logOut() {
-  await signOut({ redirectTo: "/auth" });
+  await signOut({ redirectTo: "/landing" });
 }
 
 export async function uploadMessage(formdata: FormData) {
   try {
-    
     await dbConnect();
     const session = await auth();
     const messageRaw = formdata.get("message");
@@ -36,9 +36,9 @@ export async function uploadMessage(formdata: FormData) {
           body: form,
         }
       );
-      
+
       const result = await res.json();
-      message.content.image = result.data.display_url;      
+      message.content.image = result.data.display_url;
     }
 
     const msg = await Messages.create({ user: session?.user?.id, ...message });
@@ -62,4 +62,31 @@ export async function getMessages() {
   }
 }
 
+export async function updateFeedback(
+  feedback: Feedback,
+  type: "new" | "update"
+) {
+  try {
+    if (type === "update") {
+      await Feedbacks.findByIdAndUpdate(feedback._id, feedback);
+      return;
+    }
+    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {_id,...values}=feedback
+     await Feedbacks.create({...values});
+  } catch (error) {
+    console.log(error, "error updatingFeedback");
+    throw error;
+  }
+}
 
+export async function getAllFeedbacks() {
+  try {
+    const res= await Feedbacks.find()
+    return JSON.stringify(res)
+  } catch (error) {
+    console.log('err getting all feedbacks',error);
+    throw error
+  }
+}

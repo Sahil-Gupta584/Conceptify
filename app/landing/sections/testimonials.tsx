@@ -23,7 +23,7 @@ export default function Testimonials() {
                     </div>
                     <div className="mb-4">⭐⭐⭐⭐⭐</div>
                     <p className="text-gray-300">
-                        &quot;Studying anatomy became so much easier with StudyGraphix. The visual
+                        &quot;Studying anatomy became so much easier with Conceptify. The visual
                         diagrams helped me memorize complex systems in half the time. My test
                         scores improved significantly!&quot;
                     </p>
@@ -66,7 +66,7 @@ export default function Testimonials() {
                     <div className="mb-4">⭐⭐⭐⭐⭐</div>
                     <p className="text-gray-300">
                         &quot;Organizing case studies was always challenging until I found
-                        StudyGraphix. Now I can visualize complex legal concepts and remember
+                        Conceptify. Now I can visualize complex legal concepts and remember
                         them easily during exams.&quot;
                     </p>
                 </div>

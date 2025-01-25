@@ -1,20 +1,21 @@
+import Link from 'next/link'
 import React from 'react'
 
 export default function Working() {
     return <section id="howItWorks" className="py-20 bg-neutral-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16 animate__animated animate__fadeIn">
-                <h2 className="text-4xl font-bold mb-4">How StudyGraphix Works</h2>
+                <h2 className="text-4xl font-bold mb-4">How Conceptify Works</h2>
                 <p className="text-xl text-gray-300">
                     Transform your notes into visual concepts in three simple steps
                 </p>
             </div>
             <div className="relative">
                 {/* Connection Line */}
-                <div className="hidden lg:block absolute top-1/2 left-0 w-full h-1 bg-purple-600 transform -translate-y-1/2 z-0" />
                 <div className="grid lg:grid-cols-3 gap-8 relative z-10">
+                    <div className=" lg:block absolute lg:top-1/2 top-0 lg:left-0 left-1/2 lg:w-full w-1 lg:h-1 h-full bg-purple-600 lg:transform lg:-translate-y-1/2 z-0" />
                     {/* Step 1 */}
-                    <div className="bg-neutral-800 rounded-xl p-8 border border-purple-500/30 animate__animated animate__fadeInLeft">
+                    <div className="bg-neutral-800 rounded-xl p-8 border border-purple-500/30 animate__animated animate__fadeInLeft z-10">
                         <div className="flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-6 mx-auto">
                             <span className="text-2xl font-bold">1</span>
                         </div>
@@ -42,8 +43,7 @@ export default function Working() {
                         </div>
                     </div>
                     {/* Step 2 */}
-                    <div
-                        className="bg-neutral-800 rounded-xl p-8 border border-purple-500/30 animate__animated animate__fadeInUp"
+                    <div className="bg-neutral-800 rounded-xl p-8 border border-purple-500/30 animate__animated animate__fadeInUp z-10"
                         style={{ animationDelay: "0.2s" }}
                     >
                         <div className="flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-6 mx-auto">
@@ -56,7 +56,7 @@ export default function Working() {
                         </p>
                         <div className="mt-6 p-4 bg-neutral-700 rounded-lg flex items-center justify-center">
                             <svg
-                                className="w-12 h-12 text-purple-400 animate-spin-slow"
+                                className="w-12 h-12 text-purple-400 animate-[spin_3s_linear_infinite]"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -72,7 +72,7 @@ export default function Working() {
                     </div>
                     {/* Step 3 */}
                     <div
-                        className="bg-neutral-800 rounded-xl p-8 border border-purple-500/30 animate__animated animate__fadeInRight"
+                        className="bg-neutral-800 rounded-xl p-8 border border-purple-500/30 animate__animated animate__fadeInRight z-10"
                         style={{ animationDelay: "0.4s" }}
                     >
                         <div className="flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-6 mx-auto">
@@ -103,12 +103,13 @@ export default function Working() {
                     </div>
                 </div>
                 <div className="mt-16 text-center">
-                    <button
+                    <Link
+                        href="/auth"
                         className="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-lg text-lg font-semibold transition-colors animate__animated animate__fadeInUp"
                         style={{ animationDelay: "0.6s" }}
                     >
                         Get Started Now
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
