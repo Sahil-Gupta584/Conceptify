@@ -18,26 +18,25 @@ export default function FeedbackPage() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [feedbackList, setFeedbackList] = useState<Feedback[]>([
-        {
-            _id: '1',
-            title: 'Add Dark Mode',
-            description: 'It would be great to have a dark mode option for better visibility at night.',
-            upvotes: 15,
-            upvotedBy: []
-        },
-        {
-            _id: '2',
-            title: 'Mobile App',
-            description: 'Please develop a mobile app version for easier access on phones.',
-            upvotes: 8,
-            upvotedBy: []
-        }
+        // {
+        //     _id: '1',
+        //     title: 'Add Dark Mode',
+        //     description: 'It would be great to have a dark mode option for better visibility at night.',
+        //     upvotes: 15,
+        //     upvotedBy: []
+        // },
+        // {
+        //     _id: '2',
+        //     title: 'Mobile App',
+        //     description: 'Please develop a mobile app version for easier access on phones.',
+        //     upvotes: 8,
+        //     upvotedBy: []
+        // }
     ]);
     const router = useRouter()
     const { data, status } = useSession();
 
     useEffect(() => {
-        console.log('data', data);
         if (status === 'unauthenticated') {
             router.push('/')
         }

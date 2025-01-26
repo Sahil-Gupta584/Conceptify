@@ -44,7 +44,7 @@ export default function ChatSection() {
 
         const type = () => {
             if (textPosition < text.length) {
-                setTypedText((prev) => prev + text[textPosition]);
+                setTypedText((prev) => text[textPosition] ?prev + text[textPosition]:prev);
                 textPosition++;
                 setTimeout(type, 15);
             } else {
