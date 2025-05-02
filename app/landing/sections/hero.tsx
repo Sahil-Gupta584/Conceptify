@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 export default function HeroSection() {
     return (
@@ -16,9 +17,15 @@ export default function HeroSection() {
                             easy-to-understand diagrams. Learn faster, remember longer.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 sm:items-start items-center">
+                             <Link
+                            target="_blank"
+                            href="/"
+                            className="bg-purple-600 px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+                        >
                             <button className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg text-lg font-semibold transition-colors w-full sm:w-fit">
                             Chat - It&apos;s Free <ExternalLink className=" h-5 w-5 mb-1 inline-block" /> 
                             </button>
+                                  </Link>
                             <button className="border border-purple-500 hover:bg-purple-900/30 px-8 py-3 rounded-lg text-lg font-semibold transition-colors w-full sm:w-fit">
                                 Watch Demo
                             </button>
