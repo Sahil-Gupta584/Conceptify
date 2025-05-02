@@ -41,7 +41,7 @@ function Avatar({ user }: { user: User | undefined }) {
 
       {/* Popover */}
       {isOpen && user && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 w-fit">
           {/* User Info Section */}
           <div className="p-4">
             <div className="flex items-center space-x-4">
